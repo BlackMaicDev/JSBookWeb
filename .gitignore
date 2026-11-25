@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+__pycache__/
+*.pyc
 
 # next.js
 /.next/
@@ -32,6 +34,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# personal bookshelf exports generated for manual database import
+/supabase/imports/*.sql
+/supabase/imports/*.xlsx
 
 # vercel
 .vercel

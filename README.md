@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Family JS
 
-## Getting Started
+คู่มือขึ้น Vercel: [docs/deploy-vercel.md](docs/deploy-vercel.md) แอปรองรับทั้ง `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` และ `NEXT_PUBLIC_SUPABASE_ANON_KEY` แบบเดิม
 
-First, run the development server:
+นำเข้า Bookshelf Excel: [docs/import-bookshelf-2026-11-24.md](docs/import-bookshelf-2026-11-24.md)
+
+เว็บเรื่องเล่า หนังสือ และชีวิตประจำวัน สร้างด้วย Next.js 16
+
+## เริ่มใช้งาน
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+เปิด `http://localhost:3000` เพื่อดูหน้าแรก
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## หน้าในเว็บไซต์
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` หน้าแรกและทางเข้าหมวดรีวิว
+- `/genre/crime`, `/genre/classics`, `/genre/wuxia`, `/genre/romance`, `/genre/manga` รีวิวหนังสือ 5 หมวด
+- `/blog` บล็อกทั่วไป แสดงเฉพาะบทความที่เผยแพร่ใน Supabase
+- `/login` และ `/admin` เข้าสู่ระบบและจัดการรีวิว/บล็อกผ่าน Supabase
 
-## Learn More
+ตั้งค่า `NEXT_PUBLIC_SUPABASE_URL` และ `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (หรือ `NEXT_PUBLIC_SUPABASE_ANON_KEY` แบบเดิม) ใน `.env.local` สำหรับโปรเจกต์ใหม่ให้รัน migration `001` → `004` → `006` → `007` เท่านั้น (`002`/`003` เป็น migration เดโมเก่าที่เปิดสิทธิ์กว้างเกินไป) โปรเจกต์ที่เคยรันแล้วให้ตรวจสิทธิ์ตาม [คู่มือตรวจความปลอดภัย](docs/security-check.md) บัญชีที่จะใช้แอดมินต้องมี `profiles.role` เป็น `editor` หรือ `admin`
 
-To learn more about Next.js, take a look at the following resources:
+ข้อมูลรีวิวหนังสือและบทความอยู่ใน Supabase เท่านั้น ส่วน `lib/genres-data.ts` เก็บรูปแบบธีมของแต่ละหมวด และ `lib/blog-data.ts` เก็บชนิดข้อมูลบทความ
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+รายละเอียดโครงข้อมูลอยู่ใน [docs/content-foundation.md](docs/content-foundation.md) หน้าเว็บอ่านข้อมูลจาก Supabase เท่านั้น หากหมวดหรือบล็อกยังไม่มีรายการเผยแพร่ จะแสดงหน้าว่าง
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+ภาพปกอัปโหลดผ่านหน้าแอดมินไปยัง bucket `book-covers` เมื่อใช้ migration `202611230004_secure_covers.sql` แล้ว ฐานข้อมูลเก็บ path ของไฟล์ใน `books.cover_path` หากไม่มีรูป เว็บใช้ปกจำลองเดิม
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+รูปปกบทความและรูปที่แทรกใน Rich Text ใช้ bucket `book-covers` เดิม รูปปกบทความเก็บ path ใน `blog_posts.sections[0].cover_path` ส่วนรูปในเนื้อหาเก็บ URL ใน HTML ที่ผ่านการกรองก่อนบันทึก ไฟล์จะถูกย่อในเบราว์เซอร์ก่อนอัปโหลด ไม่ต้องสร้าง bucket หรือตารางเพิ่ม
+ก่อนอัปโหลด เบราว์เซอร์จะย่อภาพให้ไม่เกิน 1200 × 1800 พิกเซลและแปลงเป็น WebP (หรือ JPEG เมื่อเบราว์เซอร์ไม่รองรับ) โดยไฟล์ที่ส่งไป Storage ต้องไม่เกิน 5 MB

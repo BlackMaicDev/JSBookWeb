@@ -1,69 +1,124 @@
+import Link from "next/link";
 import Image from "next/image";
+import { GENRE_THEMES } from "@/lib/genres-data";
+import { GenreNav, genreOrder } from "@/components/EditorialSite";
+import GenreCabinets from "@/components/GenreCabinets";
+import MotionEffects from "@/components/MotionEffects";
+import { contentRepository } from "@/lib/content/repository";
+import { BlogArt } from "@/components/BlogContent";
+import CurrentYear from "@/components/CurrentYear";
+import { Award } from "lucide-react";
+import HomeAmbient from "@/components/HomeAmbient";
 
-export default function Home() {
+export default async function HomePage() {
+  const [blogPosts, profile] = await Promise.all([
+    contentRepository.getBlogPosts(),
+    contentRepository.getAboutProfile(),
+  ]);
+  const topBooks = profile.top_books || [];
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <div className="bokk bokk-home">
+      <HomeAmbient />
+      <MotionEffects />
+      <GenreNav />
+      <main>
+        <section className="home-hero">
+          <div className="home-hero-inner">
+            <p className="eyebrow">FAMILY JS · STORIES, BOOKS & LIFE</p>
+            <h1>ทุกวันมีเรื่องเล่า<br /><em>ให้กลับมาอ่าน</em></h1>
+            <p className="home-intro">บ้านเล็ก ๆ ของเรื่องราวดี ๆ จากหนังสือเล่มโปรดไปจนถึงบันทึกชีวิตประจำวัน เลือกอ่านตามอารมณ์ แล้วอยู่ด้วยกันอีกสักพัก</p>
+            <div className="home-hero-rule"><span>EXPLORE THE STORIES</span><span>BOOK REVIEWS + EVERYDAY BLOG</span></div>
+          </div>
+          <div className="home-hero-art family-home-art" aria-hidden="true"><Image src="/family-js-mark.svg" alt="" width={92} height={92} className="family-home-logo-mark" /><span>FAMILY</span><strong>JS.</strong><small>STORIES LIVE HERE</small></div>
+        </section>
+
+        {/* ── TOP 10 SHOWCASE ── */}
+        {topBooks.length > 0 && (
+          <section className="home-top10" aria-labelledby="home-top10-title">
+            <div className="home-top10-ambient-spotlight" aria-hidden="true" />
+            <div className="home-top10-header">
+              <div>
+                <p className="eyebrow"><Award size={14} className="inline -mt-0.5 mr-1 text-amber-500" />ALL-TIME FAVORITES</p>
+                <h2 id="home-top10-title">หนังสือที่สุดในดวงใจ</h2>
+                <p className="home-top10-sub">จากคลังหนังสือทั้งหมด เราคัดสรร {topBooks.length} เล่มที่ประทับใจที่สุด พร้อมเหตุผลจากใจจริง</p>
+              </div>
+              <Link href="/about" className="home-top10-more">ดูรายละเอียดทั้งหมด</Link>
+            </div>
+
+            {/* Top 3 Podium — medal ceremony style: #2 | #1 | #3 */}
+            <div className="top10-podium">
+              {[2, 1, 3].map((targetRank) => {
+                const item = topBooks.find((b) => b.rank === targetRank);
+                if (!item) return null;
+                const book = item.book;
+                const medal = item.rank === 1 ? "🥇" : item.rank === 2 ? "🥈" : "🥉";
+                return (
+                  <div className={`podium-slot podium-slot-${item.rank}`} key={item.rank}>
+                    {/* Person on the podium (cover + info) */}
+                    <div className="podium-person">
+                      <div className="podium-cover">
+                        {book?.cover_url ? (
+                          <Image src={book.cover_url} alt={book.title} fill sizes="(max-width: 700px) 120px, 170px" className="object-cover" />
+                        ) : (
+                          <div className="podium-cover-fallback">
+                            <Award size={24} className="text-amber-400" />
+                          </div>
+                        )}
+                        <span className="podium-medal">{medal}</span>
+                      </div>
+                      <div className="podium-info">
+                        <h3>{book?.title || "หนังสือในดวงใจ"}</h3>
+                        <p className="podium-author">โดย {book?.author || "—"}</p>
+                        {item.note && <p className="podium-note">&ldquo;{item.note}&rdquo;</p>}
+                      </div>
+                    </div>
+                    {/* The pedestal block */}
+                    <div className="podium-pedestal">
+                      <span className="pedestal-rank">{item.rank}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Remaining books (rank 4+) */}
+            {topBooks.length > 3 && (
+              <div className="top10-rest-grid">
+                {topBooks.slice(3).map((item) => {
+                  const book = item.book;
+                  return (
+                    <article className="top10-rest-card" key={item.rank}>
+                      <span className="top10-rest-rank">#{String(item.rank).padStart(2, "0")}</span>
+                      <div className="top10-rest-cover">
+                        {book?.cover_url ? (
+                          <Image src={book.cover_url} alt={book.title} fill sizes="68px" className="object-cover" />
+                        ) : (
+                          <div className="podium-cover-fallback" style={{ fontSize: "0.65rem" }}>
+                            <Award size={16} className="text-amber-400/60" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="top10-rest-info">
+                        <h4>{book?.title || "หนังสือในดวงใจ"}</h4>
+                        <span>โดย {book?.author || "—"}{item.note ? ` · "${item.note}"` : ""}</span>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
+
+        <section className="home-directory" aria-labelledby="directory-title">
+          <div className="home-section-heading"><p className="eyebrow">THE FAMILY JS LIBRARY</p><h2 id="directory-title">เปิดตู้ เลือกโลกที่อยากอ่าน</h2><p className="cabinet-instruction">เลือกตู้ที่ชอบ เมื่อบานประตูเปิดแล้ว เราจะพาไปพบหนังสือในหมวดนั้น</p></div>
+          <GenreCabinets genres={genreOrder.map((id) => GENRE_THEMES[id])} />
+        </section>
+        {blogPosts.length > 0 && (
+        <section className="home-blog-section" aria-labelledby="home-blog-title"><div className="home-blog-heading"><div><p className="eyebrow">BEYOND THE BOOKS</p><h2 id="home-blog-title">เรื่องเล่าจากวันธรรมดา</h2><p>อ่านบันทึกเกี่ยวกับบ้าน ชีวิต ไอเดีย และคนที่เราอยากใช้เวลาด้วย</p></div><Link href="/blog">ดูบล็อกทั้งหมด</Link></div><div className="home-blog-grid">{blogPosts.slice(0, 2).map((post) => <Link className="home-blog-card" href={`/blog/${post.slug}`} key={post.slug}><BlogArt art={post.art} coverUrl={post.coverUrl} title={post.title} /><div><span>{post.category} · {post.readingTime}</span><h3>{post.title}</h3><p>{post.excerpt}</p><strong>อ่านบทความ</strong></div></Link>)}</div></section>
+        )}
       </main>
+      <footer className="bokk-footer"><span>FAMILY JS © <CurrentYear /></span><Link href="/blog">บล็อกทั่วไป</Link><Link href="/about">เกี่ยวกับเรา</Link><span>STORIES · BOOKS · LIFE</span></footer>
     </div>
   );
 }
